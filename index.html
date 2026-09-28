@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sistema de Gestión</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    min-height:100vh;
+    background:#000;
+    position:relative;
+    overflow-x:hidden;
+    padding:20px;
+}
+
+/* =========================
+   VIDEO DE FONDO
+========================= */
+
+#video-fondo{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-3;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(10,40,80,0.25);
+    z-index:-2;
+}
+
+/* =========================
+   ESTILO GENERAL VIDRIO
+========================= */
+
+.header-titulo,
+.menu-principal,
+.buscador-fijo,
+.campo-titulo,
+.iconos,
+table,
+.cotizacion-form,
+.total-box{
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,0.5);
+    border-radius:18px;
+}
+
+/* =========================
+   ENCABEZADO
+========================= */
+
+.header-titulo{
+    width:95%;
+    max-width:1100px;
+    margin:0 auto 15px;
+    padding:25px 20px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+.header-titulo img{
+    height:80px;
+    width:auto;
+    object-fit:contain;
+}
+
+.header-titulo h1{
+    font-size:36px;
+    font-weight:900;
+    color:#003b5c;
+    text-align:center;
+}
+
+/* =========================
+   MENÚ PRINCIPAL
+========================= */
+
+.menu-principal{
+    width:95%;
+    max-width:1100px;
+    margin:0 auto 18px;
+
+    padding:15px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.menu-btn{
+    border:none;
+    border-radius:12px;
+    padding:14px 25px;
+
+    background:#0d4c63;
+    color:white;
+
+    font-size:15px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+.menu-btn:hover{
+    transform:scale(1.03);
+    background:#003b5c;
+}
+
+.menu-btn.activo{
+    background:#003b5c;
+    box-shadow:0 0 0 3px rgba(13,76,99,0.25);
+}
+
+/* =========================
+   SECCIONES
+========================= */
+
+.seccion{
+    width:100%;
+}
+
+.oculto{
+    display:none !important;
+}
+
+/* =========================
+   BUSCADOR
+========================= */
+
+.buscador-fijo{
+    width:95%;
+    max-width:1100px;
+    margin:0 auto 15px;
+
+    padding:12px;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    border-bottom:2px solid #0d4c63;
+}
+
+.buscador-fijo img{
+    width:27px;
+    height:27px;
+    object-fit:contain;
+}
+
+.buscador-fijo input{
+    flex:1;
+    padding:10px 12px;
+
+    font-size:15px;
+
+    border:1px solid #999;
+    border-radius:8px;
+
+    outline:none;
+}
+
+/* =========================
+   TÍTULO DOCUMENTO
+========================= */
+
+.campo-titulo{
+    width:95%;
+    max-width:1100px;
+    margin:0 auto 15px;
+
+    padding:15px;
+}
+
+.campo-titulo label{
+    display:block;
+    margin-bottom:7px;
+
+    font-weight:bold;
+    color:#003b5c;
+}
+
+.campo-titulo input{
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #999;
+    border-radius:8px;
+
+    font-size:15px;
+}
+
+/* =========================
+   TABLAS
+========================= */
+
+table{
+    width:95%;
+    max-width:1100px;
+    margin:0 auto;
+
+    border-collapse:collapse;
+    overflow:hidden;
+}
+
+th,
+td{
+    padding:12px;
+    border:1px solid #000;
+
+    font-size:13px;
+}
+
+th{
+    background:#0d4c63;
+    color:white;
+
+    font-weight:bold;
+    text-align:center;
+}
+
+td{
+    background:rgba(255,255,255,0.65);
+}
+
+table input,
+table select{
+    width:80%;
+    padding:5px;
+
+    text-align:center;
+
+    border:1px solid #999;
+    border-radius:5px;
+}
+
+.fila-activa td{
+    background:#ffd900;
+}
+
+/* =========================
+   BOTONES EDITAR / ELIMINAR
+========================= */
+
+.btn-danger{
+    background:#b30000;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:5px 9px;
+
+    cursor:pointer;
+}
+
+.btn-edit{
+    background:#d18b00;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:5px 9px;
+
+    cursor:pointer;
+}
+
+.btn-save{
+    background:#087f23;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:5px 9px;
+
+    cursor:pointer;
+}
+
+.btn-cancel{
+    background:#555;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:5px 9px;
+
+    cursor:pointer;
+}
+
+/* =========================
+   ICONOS
+========================= */
+
+.iconos{
+    width:95%;
+    max-width:1100px;
+
+    margin:15px auto 0;
+
+    padding:15px;
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:15px;
+}
+
+.icon-btn{
+    width:60px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.icon-btn:hover{
+    transform:scale(1.08);
+}
+
+.icon-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    font-size:12px;
+    font-weight:bold;
+
+    color:#0d4c63;
+
+    text-align:center;
+}
+
+/* =========================
+   COTIZACIONES
+========================= */
+
+.cotizacion-titulo{
+    width:95%;
+    max-width:1100px;
+
+    margin:0 auto 15px;
+    padding:18px;
+
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.5);
+
+    text-align:center;
+
+    color:#003b5c;
+}
+
+.cotizacion-titulo h2{
+    font-size:28px;
+    font-weight:900;
+}
+
+/* FORMULARIO */
+
+.cotizacion-form{
+    width:95%;
+    max-width:1100px;
+
+    margin:0 auto 15px;
+
+    padding:18px;
+
+    display:flex;
+    flex-wrap:wrap;
+    align-items:end;
+    justify-content:center;
+
+    gap:12px;
+}
+
+.campo-cotizacion{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.campo-cotizacion label{
+    font-size:13px;
+    font-weight:bold;
+    color:#003b5c;
+}
+
+.campo-cotizacion input{
+    padding:10px;
+
+    border:1px solid #999;
+    border-radius:8px;
+
+    font-size:14px;
+    outline:none;
+}
+
+#materialCot{
+    width:400px;
+}
+
+#precioCot{
+    width:130px;
+}
+
+#cantidadCot{
+    width:120px;
+}
+
+.btn-agregar{
+    padding:10px 20px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#0d4c63;
+    color:white;
+
+    font-size:14px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+.btn-agregar:hover{
+    background:#003b5c;
+    transform:scale(1.03);
+}
+
+/* TABLA COTIZACIÓN */
+
+#tablaCotizacion{
+    width:95%;
+    max-width:1100px;
+}
+
+#tablaCotizacion th{
+    background:white;
+    color:#000;
+
+    font-size:13px;
+    font-weight:bold;
+
+    text-align:center;
+
+    border:2px solid #000;
+
+    text-decoration:underline;
+}
+
+#tablaCotizacion td{
+    text-align:center;
+}
+
+#tablaCotizacion td:first-child{
+    text-align:left;
+}
+
+.btn-eliminar-cot{
+    background:#b30000;
+    color:white;
+
+    border:none;
+    border-radius:5px;
+
+    padding:6px 10px;
+
+    cursor:pointer;
+}
+
+/* TOTAL */
+
+.total-box{
+    width:95%;
+    max-width:1100px;
+
+    margin:15px auto 0;
+
+    padding:16px;
+
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+
+    gap:15px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    color:#003b5c;
+}
+
+#totalCotizacion{
+    color:#000;
+}
+
+/* =========================
+   BOTONES DE EXPORTACIÓN
+========================= */
+
+.botones-cotizacion{
+    width:95%;
+    max-width:1100px;
+
+    margin:15px auto;
+
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.boton-exportar{
+    background:rgba(255,255,255,0.78);
+    backdrop-filter:blur(8px);
+
+    border:1px solid rgba(255,255,255,0.5);
+
+    border-radius:15px;
+
+    padding:12px 22px;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    color:#0d4c63;
+    font-weight:bold;
+
+    transition:0.2s;
+}
+
+.boton-exportar:hover{
+    transform:scale(1.05);
+}
+
+.boton-exportar img{
+    width:45px;
+    height:45px;
+    object-fit:contain;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    .header-titulo{
+        flex-direction:column;
+        padding:18px 12px;
+    }
+
+    .header-titulo img{
+        height:65px;
+    }
+
+    .header-titulo h1{
+        font-size:24px;
+    }
+
+    .menu-btn{
+        width:100%;
+    }
+
+    table{
+        font-size:12px;
+    }
+
+    th,
+    td{
+        padding:7px 4px;
+    }
+
+    #materialCot,
+    #precioCot,
+    #cantidadCot{
+        width:100%;
+    }
+
+    .campo-cotizacion{
+        width:100%;
+    }
+
+    .btn-agregar{
+        width:100%;
+    }
+
+    .total-box{
+        justify-content:center;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     VIDEO
+========================= -->
+
+<video autoplay muted loop playsinline id="video-fondo">
+    <source src="fondo1.mp4" type="video/mp4">
+</video>
+
+
+<!-- =========================
+     ENCABEZADO
+========================= -->
+
+<div class="header-titulo">
+
+    <img src="logo.jpg" alt="Logo">
+
+    <h1 id="tituloPrincipal">
+        LISTA DE MATERIALES ELÉCTRICOS
+    </h1>
+
+</div>
+
+
+<!-- =========================
+     MENÚ
+========================= -->
+
+<div class="menu-principal">
+
+    <button
+        class="menu-btn activo"
+        id="btnMateriales"
+        onclick="mostrarSeccion('materiales')">
+        ⚡ MATERIALES ELÉCTRICOS
+    </button>
+
+    <button
+        class="menu-btn"
+        id="btnCotizaciones"
+        onclick="mostrarSeccion('cotizaciones')">
+        📋 COTIZACIONES
+    </button>
+
+</div>
+
+
+<!-- ==========================================================
+     SECCIÓN 1
+     MATERIALES ELÉCTRICOS
+========================================================== -->
+
+<section id="seccionMateriales" class="seccion">
+
+    <!-- BUSCADOR -->
+
+    <div class="buscador-fijo">
+
+        <img src="lupa.png" alt="Buscar">
+
+        <input
+            type="text"
+            id="buscador"
+            placeholder="Buscar material..."
+            onkeyup="filtrarMateriales()">
+
+    </div>
+
+
+    <!-- TÍTULO DEL DOCUMENTO -->
+
+    <div class="campo-titulo">
+
+        <label for="tituloDoc">
+            TÍTULO DEL DOCUMENTO
+        </label>
+
+        <input
+            type="text"
+            id="tituloDoc"
+            placeholder="Ejemplo: Materiales para proyecto eléctrico">
+
+    </div>
+
+
+    <!-- TABLA DE MATERIALES -->
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>#</th>
+                <th>DESCRIPCIÓN</th>
+                <th>UNIDAD</th>
+                <th>CANTIDAD</th>
+            </tr>
+
+        </thead>
+
+        <tbody id="materiales"></tbody>
+
+    </table>
+
+
+    <!-- BOTONES -->
+
+    <div class="iconos">
+
+        <div class="icon-item">
+
+            <img
+                src="generar.png"
+                class="icon-btn"
+                onclick="generarTabla()"
+                alt="Generar">
+
+            <span>GENERAR</span>
+
+        </div>
+
+
+        <div class="icon-item">
+
+            <img
+                src="pdf.png"
+                class="icon-btn"
+                onclick="exportarPDFMateriales()"
+                alt="PDF">
+
+            <span>PDF</span>
+
+        </div>
+
+
+        <div class="icon-item">
+
+            <img
+                src="excel.jpg"
+                class="icon-btn"
+                onclick="exportarExcelMateriales()"
+                alt="Excel">
+
+            <span>EXCEL</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTADO -->
+
+    <table style="margin-top:15px;">
+
+        <thead>
+
+            <tr>
+                <th>#</th>
+                <th>DESCRIPCIÓN</th>
+                <th>UNIDAD</th>
+                <th>CANTIDAD</th>
+                <th>ACCIONES</th>
+            </tr>
+
+        </thead>
+
+        <tbody id="resultado"></tbody>
+
+    </table>
+
+</section>
+
+
+<!-- ==========================================================
+     SECCIÓN 2
+     COTIZACIONES
+========================================================== -->
+
+<section id="seccionCotizaciones" class="seccion oculto">
+
+    <div class="cotizacion-titulo">
+
+        <h2>
+            PRESUPUESTO
+        </h2>
+
+    </div>
+
+
+    <!-- FORMULARIO -->
+
+    <div class="cotizacion-form">
+
+        <div class="campo-cotizacion">
+
+            <label for="materialCot">
+                MATERIAL
+            </label>
+
+            <input
+                type="text"
+                id="materialCot"
+                placeholder="Descripción del material">
+
+        </div>
+
+
+        <div class="campo-cotizacion">
+
+            <label for="precioCot">
+                PRECIO
+            </label>
+
+            <input
+                type="number"
+                id="precioCot"
+                min="0"
+                step="0.01"
+                placeholder="0.00">
+
+        </div>
+
+
+        <div class="campo-cotizacion">
+
+            <label for="cantidadCot">
+                CANTIDAD
+            </label>
+
+            <input
+                type="number"
+                id="cantidadCot"
+                min="1"
+                step="1"
+                placeholder="1">
+
+        </div>
+
+
+        <button
+            class="btn-agregar"
+            onclick="agregarFilaCotizacion()">
+
+            + AGREGAR
+
+        </button>
+
+    </div>
+
+
+    <!-- TABLA -->
+
+    <table id="tablaCotizacion">
+
+        <thead>
+
+            <tr>
+
+                <th>MATERIAL</th>
+                <th>PRECIO</th>
+                <th>CANTIDAD</th>
+                <th>TOTAL</th>
+                <th>ACCIONES</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="cuerpoCotizacion"></tbody>
+
+    </table>
+
+
+    <!-- TOTAL -->
+
+    <div class="total-box">
+
+        <span>
+            TOTAL GENERAL:
+        </span>
+
+        <span id="totalCotizacion">
+            $0.00
+        </span>
+
+    </div>
+
+
+    <!-- EXPORTACIONES -->
+
+    <div class="botones-cotizacion">
+
+        <button
+            class="boton-exportar"
+            onclick="exportarExcelCotizacion()">
+
+            <img src="excel.jpg" alt="Excel">
+
+            <span>
+                DESCARGAR EXCEL
+            </span>
+
+        </button>
+
+
+        <button
+            class="boton-exportar"
+            onclick="exportarPDFCotizacion()">
+
+            <img src="pdf.png" alt="PDF">
+
+            <span>
+                DESCARGAR PDF
+            </span>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<script>
+
+/* ==========================================================
+   CAMBIO DE SECCIONES
+========================================================== */
+
+function mostrarSeccion(seccion){
+
+    const materiales =
+        document.getElementById("seccionMateriales");
+
+    const cotizaciones =
+        document.getElementById("seccionCotizaciones");
+
+    const btnMateriales =
+        document.getElementById("btnMateriales");
+
+    const btnCotizaciones =
+        document.getElementById("btnCotizaciones");
+
+    const titulo =
+        document.getElementById("tituloPrincipal");
+
+
+    if(seccion === "materiales"){
+
+        materiales.classList.remove("oculto");
+
+        cotizaciones.classList.add("oculto");
+
+        btnMateriales.classList.add("activo");
+
+        btnCotizaciones.classList.remove("activo");
+
+        titulo.textContent =
+            "LISTA DE MATERIALES ELÉCTRICOS";
+
+    }
+
+
+    if(seccion === "cotizaciones"){
+
+        materiales.classList.add("oculto");
+
+        cotizaciones.classList.remove("oculto");
+
+        btnMateriales.classList.remove("activo");
+
+        btnCotizaciones.classList.add("activo");
+
+        titulo.textContent =
+            "SISTEMA DE COTIZACIÓN";
+
+    }
+
+}
+
+
+/* ==========================================================
+   LISTA DE MATERIALES
+========================================================== */
+
+const listaMateriales = [
+
+"ABRAZADERA COMPLETA 5 - 7 5/8 PULG.",
+"ABRAZADERA COMPLETA 6 - 6 5/8 PULG.",
+"ABRAZADERA COMPLETA 3 - 5 5/8 PULG.",
+"ABRAZADERA COMPLETA 7 - 7 5/8 PULG.",
+"ABRAZADERA COMPLETA 7 - 9 5/8 PULG.",
+"ABRAZADERA COMPLETA 8 - 8 5/8 PULG.",
+"AISLADOR CARRETE PARA SECUNDARIO",
+"AISLADOR COLUMNA SINTETICO 46KV",
+"AISLADOR SUSPENSION SINTETICO 23KV",
+"AISLADOR TENSION 46KV ANSI 54-4",
+"ALAMBRE ALUM. #4 AMARRE",
+"ALAMBRE COBRE #4",
+"ALAMBRE BIMETALICO CU ACERO 2 AWG CCS",
+"ALAMBRE CU #4 SEMI AISLADO",
+"ALMOHADILLA PARA CRUCERO",
+"ARANDELA REDONDA 5/8 PULG.",
+"ARGOLLA P/2/0 ACSR CAT J1252",
+"BARRA ANCLA 5/8 X 6 PIES DOBLE OJO",
+"BARRA ANCLA 5/8 X 6 PIES UN OJO",
+"BARRA COPPERWELD 5/8 X 8 PIES",
+"BARRA DE POLARIZACION 5/8 X 10 PIES UL DF",
+"BASE EXPANSION PARA ANCLA",
+"CABLE ALUM. ACSR #1/0",
+"CABLE ALUM. ACSR #2",
+"CABLE ALUM. F.P. (WP #2)",
+"CABLE ALUM. DUPLEX #6 F.P.",
+"CABLE ALUM. TRIPLEX #6 F.P.",
+"CABLE ALUM SEMIAISL #1/0 AAAC 25KV CONC",
+"CABLE COBRE 1/0",
+"CABLE CU #2 (COBRE)",
+"CABLE CU #2/0 F.P.",
+"CABLE CU #4/0",
+"CABLE GALVANIZADO 5/16 PULG. P/VIENTO",
+"CABLE SEMIAISLADO HENDRIX #2 AAAC 25KV",
+"CARTUCHO SOLDADURA EXOTERMICA CADWELD 90 g",
+"CARTUCHO SOLDADURA EXOTERMICA CADWELD 150 g",
+"CEPO P/CARCAZA DE TRANSFORMADOR",
+"CINTA METALICA BAND-IT 3/4 PULG.",
+"CINTA AISLANTE SUPER 33 3M",
+"CLEVIS DE REMATE 12000 LBS ALUMINIO RE-201",
+"CLEVIS DE REMATE PEQUEÑO",
+"CLEVIS ESTRIBO PARA AISLADOR CARRETE",
+"CONECTOR ARGOLLA CAT J1252",
+"CONECTOR KSU 23",
+"CONECTOR KSU 29",
+"CONECTOR TRANSFORMADOR EQC632C",
+"CONECTOR YP 25U25",
+"CONECTOR YP 26AU2",
+"CONECTOR YP 28U26",
+"CONECTOR YP 2U3",
+"CONECTOR YPC 2A8U",
+"CORTACIRCUITO 100A 23KV",
+"CORTACIRCUITO 27KV 100A 125KV BIL SIN HERRAJE",
+"CRUCERO DE 305 PULG. GALV. IMFICA",
+"CRUCERO GALV. 1/4 X 3 X 3 X 94 PULG.",
+"EXTENSION P/CORTACIRCUITO Y PARARRAYO",
+"FUSIBLE T 2A",
+"FUSIBLE T 3A",
+"FUSIBLE TIPO T 15A",
+"FUSIBLE ALTA TENSION TIPO T 6A 15/35KV TECFUSE",
+"GRAPA AGP LINEA VIVA #397 MCM",
+"GRAPA AGP LINEA VIVA #397.5 MCM",
+"GRAPA POLO A TIERRA",
+"GRILLETE ANCLAJE 11/16 PULG.",
+"HEBILLA METALICA BAND-IT 3/4 PULG.",
+"PARARRAYO 10KV HEAVY DUTY",
+"PARARRAYO 21KV HEAVY DUTY",
+"PERNO 3/4 X 3 PULG. P/AISLADOR COLUMNA",
+"PERNO 5/8 X 12 PULG. TODO ROSCA",
+"PERNO TODO ROSCA 5/8 X 14",
+"PERNO MAQUINA 1/2 X 1 1/2 PULG.",
+"PERNO MAQUINA 5/8 X 2 PULG.",
+"PERNO MAQUINA 5/8 X 10 PULG.",
+"PERNO MAQUINA 5/8 X 12 PULG.",
+"PERNO CARRUAJE 1/2 X 4 1/2 PULG.",
+"PERNO CARRUAJE 1/2 X 6 PULG.",
+"POSTE CONCRETO 26 PIES",
+"POSTE CONCRETO 40 PIES CLASE 1,000",
+"POSTE METALICO SECCIONADO 35 FACTOR 2 D",
+"POSTE METALICO SECCIONADO 26 PIES",
+"POSTE METALICO SECCIONADO 35 PIES",
+"PREFORMADA ACSR #1/0 AMARILLO DF",
+"PROTECTOR PARA RETENIDA",
+"REMATE PREFORMADO ALUM. ACSR #1/0",
+"REMATE PREFORMADO ALUM. ACSR #2",
+"REMATE PREFORMADO 1/0 AWG 25KV CG0119 BLACK",
+"REMATE PREFORM. ALUM. F.P. (WP #2)",
+"REMATE PREFORM. P/CABLE GALV. 5/16 PULG.",
+"REMATE PREFORM. P/CABLE HENDRIX AAAC #2",
+"SOPORTE ARGOLLA PARA VIENTO 5/8 (PATA MULA)",
+"SOPORTE P/AISLADOR COLUMNA 46KV",
+"TAPON DE PVC 4 PULG (P/TUBO)",
+"TIRANTE V 45 PULG.",
+"TIRANTE 72 PULG.",
+"TIRANTE ANGULAR 1/4 X 3 X 3 X 94 PULG. DERECHO",
+"TIRANTE ANGULAR 1/4 X 3 X 3 X 94 PULG. IZQUIERDO",
+"TRANSF. 7.6/13.2KV-120/240V 10KVA",
+"TRANSF. 7.6/13.2KV-120/240V 25KVA",
+"TRANSF. 37.5KV 14,000/24,000 120/240V",
+"TRANSFORMADOR 100KVA 13.2/7.6KV 120/240V",
+"TRANSFORMADOR 100KVA 14.4/24.9KV 120/240V UL TIPO CAESS EC",
+"TUBO GALVANIZADO 1/2 PULG. X 3 MTS.",
+"TUBO GALVANIZADO 6 × 4 PULG.",
+"TUERCA ARGOLLA 5/8 PULG. CON CANAL"
+
+];
+
+
+/* ==========================================================
+   CARGAR MATERIALES
+========================================================== */
+
+const tbodyMateriales =
+    document.getElementById("materiales");
+
+let datos = [];
+
+listaMateriales.forEach((m, i) => {
+
+    tbodyMateriales.innerHTML += `
+
+        <tr>
+
+            <td>${i + 1}</td>
+
+            <td>${m}</td>
+
+            <td>
+
+                <select id="und_${i}">
+
+                    <option value="UNIDAD">UNIDAD</option>
+                    <option value="PAA">PAA</option>
+                    <option value="ROL">ROL</option>
+                    <option value="M">M</option>
+
+                </select>
+
+            </td>
+
+            <td>
+
+                <input
+                    type="number"
+                    id="cant_${i}"
+                    min="0"
+                    value="0">
+
+            </td>
+
+        </tr>
+
+    `;
+
+});
+
+
+/* ==========================================================
+   MARCAR FILA ACTIVA
+========================================================== */
+
+listaMateriales.forEach((m, i) => {
+
+    const input =
+        document.getElementById(`cant_${i}`);
+
+    input.addEventListener("input", function(){
+
+        const fila =
+            this.closest("tr");
+
+        if(Number(this.value) > 0){
+
+            fila.classList.add("fila-activa");
+
+        }else{
+
+            fila.classList.remove("fila-activa");
+
+        }
+
+    });
+
+});
+
+
+/* ==========================================================
+   BUSCADOR
+========================================================== */
+
+function filtrarMateriales(){
+
+    const texto =
+        document.getElementById("buscador")
+        .value
+        .toLowerCase();
+
+    const filas =
+        tbodyMateriales.querySelectorAll("tr");
+
+    filas.forEach(fila => {
+
+        const descripcion =
+            fila.cells[1].textContent.toLowerCase();
+
+        fila.style.display =
+            descripcion.includes(texto)
+            ? ""
+            : "none";
+
+    });
+
+}
+
+
+/* ==========================================================
+   GENERAR TABLA
+========================================================== */
+
+function generarTabla(){
+
+    listaMateriales.forEach((m, i) => {
+
+        const cantidad =
+            Number(
+                document.getElementById(`cant_${i}`).value
+            );
+
+        if(cantidad > 0){
+
+            const unidad =
+                document.getElementById(`und_${i}`).value;
+
+            const existente =
+                datos.find(item => item.index === i);
+
+            if(!existente){
+
+                datos.push({
+
+                    index:i,
+                    desc:m,
+                    und:unidad,
+                    cant:cantidad
+
+                });
+
+            }else{
+
+                existente.und = unidad;
+                existente.cant = cantidad;
+
+            }
+
+        }
+
+    });
+
+    renderTablaMateriales();
+
+}
+
+
+/* ==========================================================
+   RENDER TABLA RESULTADO
+========================================================== */
+
+function renderTablaMateriales(){
+
+    const resultado =
+        document.getElementById("resultado");
+
+    resultado.innerHTML = "";
+
+    datos.forEach((item, i) => {
+
+        if(item.editando){
+
+            resultado.innerHTML += `
+
+                <tr>
+
+                    <td>${i + 1}</td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            id="editDesc_${i}"
+                            value="${item.desc}">
+
+                    </td>
+
+                    <td>
+
+                        <select id="editUnd_${i}">
+
+                            <option
+                                value="UNIDAD"
+                                ${item.und==="UNIDAD" ? "selected" : ""}>
+                                UNIDAD
+                            </option>
+
+                            <option
+                                value="PAA"
+                                ${item.und==="PAA" ? "selected" : ""}>
+                                PAA
+                            </option>
+
+                            <option
+                                value="ROL"
+                                ${item.und==="ROL" ? "selected" : ""}>
+                                ROL
+                            </option>
+
+                            <option
+                                value="M"
+                                ${item.und==="M" ? "selected" : ""}>
+                                M
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            id="editCant_${i}"
+                            min="1"
+                            value="${item.cant}">
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="btn-save"
+                            onclick="guardarEdicion(${i})">
+                            Guardar
+                        </button>
+
+                        <button
+                            class="btn-cancel"
+                            onclick="cancelarEdicion(${i})">
+                            Cancelar
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }else{
+
+            resultado.innerHTML += `
+
+                <tr>
+
+                    <td>${i + 1}</td>
+
+                    <td>${item.desc}</td>
+
+                    <td>${item.und}</td>
+
+                    <td>${item.cant}</td>
+
+                    <td>
+
+                        <button
+                            class="btn-edit"
+                            onclick="editarMaterial(${i})">
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="eliminarMaterial(${i})">
+                            Eliminar
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    });
+
+}
+
+
+/* ==========================================================
+   ELIMINAR MATERIAL
+========================================================== */
+
+function eliminarMaterial(i){
+
+    const item = datos[i];
+
+    document.getElementById(`cant_${item.index}`).value = 0;
+
+    document.getElementById(`und_${item.index}`).value =
+        "UNIDAD";
+
+    document
+        .getElementById(`cant_${item.index}`)
+        .closest("tr")
+        .classList.remove("fila-activa");
+
+    datos.splice(i,1);
+
+    renderTablaMateriales();
+
+}
+
+
+/* ==========================================================
+   EDITAR MATERIAL
+========================================================== */
+
+function editarMaterial(i){
+
+    datos[i].editando = true;
+
+    renderTablaMateriales();
+
+}
+
+
+/* ==========================================================
+   GUARDAR EDICIÓN
+========================================================== */
+
+function guardarEdicion(i){
+
+    const descripcion =
+        document.getElementById(`editDesc_${i}`).value.trim();
+
+    const unidad =
+        document.getElementById(`editUnd_${i}`).value;
+
+    const cantidad =
+        Number(
+            document.getElementById(`editCant_${i}`).value
+        );
+
+    if(!descripcion){
+
+        alert("Escribe una descripción.");
+
+        return;
+
+    }
+
+    if(cantidad <= 0){
+
+        alert("La cantidad debe ser mayor que 0.");
+
+        return;
+
+    }
+
+    const indexOriginal =
+        datos[i].index;
+
+    datos[i].desc = descripcion;
+    datos[i].und = unidad;
+    datos[i].cant = cantidad;
+    datos[i].editando = false;
+
+    listaMateriales[indexOriginal] =
+        descripcion;
+
+    document.getElementById(
+        `cant_${indexOriginal}`
+    ).value = cantidad;
+
+    document.getElementById(
+        `und_${indexOriginal}`
+    ).value = unidad;
+
+    renderTablaMateriales();
+
+}
+
+
+/* ==========================================================
+   CANCELAR EDICIÓN
+========================================================== */
+
+function cancelarEdicion(i){
+
+    datos[i].editando = false;
+
+    renderTablaMateriales();
+
+}
+
+
+/* ==========================================================
+   EXPORTAR PDF MATERIALES
+========================================================== */
+
+function exportarPDFMateriales(){
+
+    if(datos.length === 0){
+
+        alert("Primero genera la tabla.");
+
+        return;
+
+    }
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+        new jsPDF({
+            orientation:"portrait",
+            unit:"mm",
+            format:"letter"
+        });
+
+
+    const titulo =
+        document.getElementById("tituloDoc").value.trim()
+        || "LISTA DE MATERIALES ELÉCTRICOS";
+
+
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(16);
+
+    doc.text(
+        titulo,
+        105,
+        20,
+        {align:"center"}
+    );
+
+
+    const inicioX = 15;
+
+    const anchoTotal = 180;
+
+    const anchos = [
+        15,
+        105,
+        30,
+        30
+    ];
+
+    let y = 32;
+
+    const altoHeader = 9;
+
+
+    const encabezados = [
+        "N°",
+        "DESCRIPCIÓN",
+        "UNIDAD",
+        "CANTIDAD"
+    ];
+
+
+    /* ENCABEZADO */
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica","bold");
+    doc.setTextColor(0,0,0);
+
+    let x = inicioX;
+
+    encabezados.forEach((texto,i)=>{
+
+        doc.setFillColor(255,255,255);
+
+        doc.rect(
+            x,
+            y,
+            anchos[i],
+            altoHeader,
+            "FD"
+        );
+
+        const centro =
+            x + anchos[i]/2;
+
+        doc.text(
+            texto,
+            centro,
+            y + 5.5,
+            {align:"center"}
+        );
+
+        const anchoTexto =
+            doc.getTextWidth(texto);
+
+        doc.setLineWidth(0.5);
+
+        doc.line(
+            centro - anchoTexto/2,
+            y + 6.5,
+            centro + anchoTexto/2,
+            y + 6.5
+        );
+
+        x += anchos[i];
+
+    });
+
+
+    y += altoHeader;
+
+
+    /* FILAS */
+
+    doc.setFont("helvetica","normal");
+
+    datos.forEach((item,i)=>{
+
+        const descripcion =
+            doc.splitTextToSize(
+                item.desc,
+                anchos[1] - 4
+            );
+
+        const altoFila =
+            Math.max(
+                8,
+                descripcion.length * 4.5 + 3
+            );
+
+
+        if(y + altoFila > 270){
+
+            doc.addPage();
+
+            y = 20;
+
+            doc.setFont("helvetica","bold");
+
+            let xHeader = inicioX;
+
+            encabezados.forEach((texto,j)=>{
+
+                doc.rect(
+                    xHeader,
+                    y,
+                    anchos[j],
+                    altoHeader
+                );
+
+                doc.text(
+                    texto,
+                    xHeader + anchos[j]/2,
+                    y + 5.5,
+                    {align:"center"}
+                );
+
+                xHeader += anchos[j];
+
+            });
+
+            y += altoHeader;
+
+            doc.setFont("helvetica","normal");
+
+        }
+
+
+        let xFila = inicioX;
+
+
+        const valores = [
+            String(i + 1),
+            descripcion,
+            item.und,
+            String(item.cant)
+        ];
+
+
+        valores.forEach((valor,j)=>{
+
+            doc.rect(
+                xFila,
+                y,
+                anchos[j],
+                altoFila
+            );
+
+            if(j === 1){
+
+                doc.text(
+                    valor,
+                    xFila + 2,
+                    y + 5
+                );
+
+            }else{
+
+                doc.text(
+                    valor,
+                    xFila + anchos[j]/2,
+                    y + 5,
+                    {align:"center"}
+                );
+
+            }
+
+            xFila += anchos[j];
+
+        });
+
+
+        y += altoFila;
+
+    });
+
+
+    doc.save("materiales.pdf");
+
+}
+
+
+/* ==========================================================
+   EXPORTAR EXCEL MATERIALES
+========================================================== */
+
+function exportarExcelMateriales(){
+
+    if(datos.length === 0){
+
+        alert("Primero genera la tabla.");
+
+        return;
+
+    }
+
+
+    const titulo =
+        document.getElementById("tituloDoc").value.trim()
+        || "LISTA DE MATERIALES ELÉCTRICOS";
+
+
+    const datosExcel = [
+
+        [titulo],
+
+        [],
+
+        [
+            "N°",
+            "DESCRIPCIÓN",
+            "UNIDAD",
+            "CANTIDAD"
+        ]
+
+    ];
+
+
+    datos.forEach((item,i)=>{
+
+        datosExcel.push([
+
+            i + 1,
+            item.desc,
+            item.und,
+            item.cant
+
+        ]);
+
+    });
+
+
+    const ws =
+        XLSX.utils.aoa_to_sheet(datosExcel);
+
+
+    ws["!merges"] = [
+
+        {
+            s:{r:0,c:0},
+            e:{r:0,c:3}
+        }
+
+    ];
+
+
+    ws["!cols"] = [
+
+        {wch:8},
+        {wch:60},
+        {wch:15},
+        {wch:15}
+
+    ];
+
+
+    const estiloEncabezado = {
+
+        font:{
+            bold:true,
+            color:{rgb:"000000"},
+            underline:"single"
+        },
+
+        alignment:{
+            horizontal:"center",
+            vertical:"center",
+            wrapText:true
+        },
+
+        border:{
+
+            top:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            bottom:{
+                style:"medium",
+                color:{rgb:"000000"}
+            },
+
+            left:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            right:{
+                style:"thin",
+                color:{rgb:"000000"}
+            }
+
+        },
+
+        fill:{
+            fgColor:{rgb:"FFFFFF"}
+        }
+
+    };
+
+
+    ["A3","B3","C3","D3"].forEach(celda=>{
+
+        ws[celda].s =
+            estiloEncabezado;
+
+    });
+
+
+    const wb =
+        XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "Materiales"
+    );
+
+
+    XLSX.writeFile(
+        wb,
+        "materiales.xlsx"
+    );
+
+}
+
+
+/* ==========================================================
+   COTIZACIONES
+========================================================== */
+
+let totalGeneral = 0;
+
+
+/* ==========================================================
+   AGREGAR FILA COTIZACIÓN
+========================================================== */
+
+function agregarFilaCotizacion(){
+
+    const material =
+        document
+        .getElementById("materialCot")
+        .value
+        .trim();
+
+    const precio =
+        Number(
+            document.getElementById("precioCot").value
+        );
+
+    const cantidad =
+        Number(
+            document.getElementById("cantidadCot").value
+        );
+
+
+    if(!material){
+
+        alert("Escribe el presupuesto.");
+
+        return;
+
+    }
+
+
+    if(isNaN(precio) || precio < 0){
+
+        alert("Ingresa un precio válido.");
+
+        return;
+
+    }
+
+
+    if(!Number.isInteger(cantidad) || cantidad <= 0){
+
+        alert("La cantidad debe ser un número entero mayor que 0.");
+
+        return;
+
+    }
+
+
+    const total =
+        precio * cantidad;
+
+
+    totalGeneral += total;
+
+
+    const cuerpo =
+        document.getElementById("cuerpoCotizacion");
+
+
+    const fila =
+        document.createElement("tr");
+
+
+    fila.innerHTML = `
+
+        <td>
+            ${material}
+        </td>
+
+        <td>
+            $${precio.toFixed(2)}
+        </td>
+
+        <td>
+            ${cantidad}
+        </td>
+
+        <td>
+            $${total.toFixed(2)}
+        </td>
+
+        <td>
+
+            <button
+                class="btn-eliminar-cot"
+                onclick="eliminarFilaCotizacion(this, ${total})">
+
+                Eliminar
+
+            </button>
+
+        </td>
+
+    `;
+
+
+    cuerpo.appendChild(fila);
+
+
+    actualizarTotalCotizacion();
+
+
+    document.getElementById("materialCot").value = "";
+    document.getElementById("precioCot").value = "";
+    document.getElementById("cantidadCot").value = "";
+
+
+    document
+        .getElementById("materialCot")
+        .focus();
+
+}
+
+
+/* ==========================================================
+   ELIMINAR COTIZACIÓN
+========================================================== */
+
+function eliminarFilaCotizacion(boton,total){
+
+    totalGeneral -= total;
+
+
+    const fila =
+        boton.closest("tr");
+
+
+    fila.remove();
+
+
+    actualizarTotalCotizacion();
+
+}
+
+
+/* ==========================================================
+   ACTUALIZAR TOTAL
+========================================================== */
+
+function actualizarTotalCotizacion(){
+
+    document.getElementById(
+        "totalCotizacion"
+    ).textContent =
+        "$" + totalGeneral.toFixed(2);
+
+}
+
+
+/* ==========================================================
+   OBTENER DATOS COTIZACIÓN
+========================================================== */
+
+function obtenerDatosCotizacion(){
+
+    const filas =
+        document.querySelectorAll(
+            "#cuerpoCotizacion tr"
+        );
+
+
+    const datos = [];
+
+
+    filas.forEach(fila=>{
+
+        const celdas =
+            fila.querySelectorAll("td");
+
+
+        if(celdas.length >= 4){
+
+            datos.push({
+
+                material:
+                    celdas[0].textContent.trim(),
+
+                precio:
+                    celdas[1].textContent.trim(),
+
+                cantidad:
+                    celdas[2].textContent.trim(),
+
+                total:
+                    celdas[3].textContent.trim()
+
+            });
+
+        }
+
+    });
+
+
+    return datos;
+
+}
+
+
+/* ==========================================================
+   EXPORTAR EXCEL COTIZACIÓN
+========================================================== */
+
+function exportarExcelCotizacion(){
+
+    const datos =
+        obtenerDatosCotizacion();
+
+
+    if(datos.length === 0){
+
+        alert("Primero agrega materiales a la cotización.");
+
+        return;
+
+    }
+
+
+    const filasExcel = [
+
+        ["PRESUPUESTO"],
+
+        [],
+
+        [
+            "MATERIAL",
+            "PRECIO",
+            "CANTIDAD",
+            "TOTAL"
+        ]
+
+    ];
+
+
+    datos.forEach(item=>{
+
+        filasExcel.push([
+
+            item.material,
+            item.precio,
+            Number(item.cantidad),
+            item.total
+
+        ]);
+
+    });
+
+
+    filasExcel.push([]);
+
+    filasExcel.push([
+
+        "",
+        "",
+        "TOTAL GENERAL",
+        "$" + totalGeneral.toFixed(2)
+
+    ]);
+
+
+    const ws =
+        XLSX.utils.aoa_to_sheet(filasExcel);
+
+
+    ws["!merges"] = [
+
+        {
+            s:{r:0,c:0},
+            e:{r:0,c:3}
+        }
+
+    ];
+
+
+    ws["!cols"] = [
+
+        {wch:55},
+        {wch:18},
+        {wch:15},
+        {wch:18}
+
+    ];
+
+
+    /* ESTILO DEL ENCABEZADO */
+
+    const estiloEncabezado = {
+
+        font:{
+            bold:true,
+            color:{rgb:"000000"},
+            underline:"single"
+        },
+
+        alignment:{
+            horizontal:"center",
+            vertical:"center",
+            wrapText:true
+        },
+
+        border:{
+
+            top:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            bottom:{
+                style:"medium",
+                color:{rgb:"000000"}
+            },
+
+            left:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            right:{
+                style:"thin",
+                color:{rgb:"000000"}
+            }
+
+        },
+
+        fill:{
+            fgColor:{rgb:"FFFFFF"}
+        }
+
+    };
+
+
+    ["A3","B3","C3","D3"].forEach(celda=>{
+
+        ws[celda].s =
+            estiloEncabezado;
+
+    });
+
+
+    /* ESTILO TOTAL */
+
+    const estiloTotal = {
+
+        font:{
+            bold:true,
+            color:{rgb:"000000"}
+        },
+
+        alignment:{
+            horizontal:"center",
+            vertical:"center"
+        },
+
+        border:{
+
+            top:{
+                style:"medium",
+                color:{rgb:"000000"}
+            },
+
+            bottom:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            left:{
+                style:"thin",
+                color:{rgb:"000000"}
+            },
+
+            right:{
+                style:"thin",
+                color:{rgb:"000000"}
+            }
+
+        }
+
+    };
+
+
+    ws["C" + (filasExcel.length)].s =
+        estiloTotal;
+
+    ws["D" + (filasExcel.length)].s =
+        estiloTotal;
+
+
+    const wb =
+        XLSX.utils.book_new();
+
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "Cotización"
+    );
+
+
+    XLSX.writeFile(
+        wb,
+        "cotizacion.xlsx"
+    );
+
+}
+
+
+/* ==========================================================
+   EXPORTAR PDF COTIZACIÓN
+========================================================== */
+
+function exportarPDFCotizacion(){
+
+    const datos =
+        obtenerDatosCotizacion();
+
+
+    if(datos.length === 0){
+
+        alert("Primero agrega materiales a la cotización.");
+
+        return;
+
+    }
+
+
+    const { jsPDF } = window.jspdf;
+
+
+    const doc =
+        new jsPDF({
+
+            orientation:"portrait",
+            unit:"mm",
+            format:"letter"
+
+        });
+
+
+    /* TÍTULO */
+
+    doc.setFont("helvetica","bold");
+
+    doc.setFontSize(18);
+
+    doc.setTextColor(0,59,92);
+
+    doc.text(
+        "PRESUPUESTO",
+        105,
+        20,
+        {align:"center"}
+    );
+
+
+    const inicioX = 12;
+
+    const anchos = [
+        90,
+        30,
+        25,
+        40
+    ];
+
+
+    const altoHeader = 10;
+
+    let y = 30;
+
+
+    const encabezados = [
+
+        "MATERIAL",
+        "PRECIO",
+        "CANTIDAD",
+        "TOTAL"
+
+    ];
+
+
+    /* ENCABEZADO */
+
+    doc.setFont("helvetica","bold");
+
+    doc.setFontSize(9);
+
+    doc.setTextColor(0,0,0);
+
+
+    let x = inicioX;
+
+
+    encabezados.forEach((texto,i)=>{
+
+        doc.setFillColor(255,255,255);
+
+        doc.setDrawColor(0,0,0);
+
+        doc.setLineWidth(0.7);
+
+
+        doc.rect(
+            x,
+            y,
+            anchos[i],
+            altoHeader,
+            "FD"
+        );
+
+
+        const centro =
+            x + anchos[i] / 2;
+
+
+        doc.text(
+            texto,
+            centro,
+            y + 6,
+            {align:"center"}
+        );
+
+
+        /* SUBRAYADO DEL TEXTO */
+
+        const anchoTexto =
+            doc.getTextWidth(texto);
+
+
+        doc.setLineWidth(0.5);
+
+
+        doc.line(
+
+            centro - anchoTexto / 2,
+
+            y + 7,
+
+            centro + anchoTexto / 2,
+
+            y + 7
+
+        );
+
+
+        x += anchos[i];
+
+    });
+
+
+    y += altoHeader;
+
+
+    /* FILAS */
+
+    doc.setFont("helvetica","normal");
+
+    doc.setFontSize(9);
+
+
+    datos.forEach(item=>{
+
+        const material =
+            doc.splitTextToSize(
+                item.material,
+                anchos[0] - 4
+            );
+
+
+        const altoFila =
+            Math.max(
+                9,
+                material.length * 4.5 + 4
+            );
+
+
+        /* NUEVA PÁGINA */
+
+        if(y + altoFila > 260){
+
+            doc.addPage();
+
+            y = 20;
+
+
+            doc.setFont("helvetica","bold");
+
+            let xHeader = inicioX;
+
+
+            encabezados.forEach((texto,i)=>{
+
+                doc.rect(
+                    xHeader,
+                    y,
+                    anchos[i],
+                    altoHeader
+                );
+
+
+                const centro =
+                    xHeader + anchos[i]/2;
+
+
+                doc.text(
+                    texto,
+                    centro,
+                    y + 6,
+                    {align:"center"}
+                );
+
+
+                const anchoTexto =
+                    doc.getTextWidth(texto);
+
+
+                doc.line(
+
+                    centro - anchoTexto/2,
+
+                    y + 7,
+
+                    centro + anchoTexto/2,
+
+                    y + 7
+
+                );
+
+
+                xHeader += anchos[i];
+
+            });
+
+
+            y += altoHeader;
+
+
+            doc.setFont("helvetica","normal");
+
+        }
+
+
+        let xFila = inicioX;
+
+
+        const valores = [
+
+            material,
+            item.precio,
+            item.cantidad,
+            item.total
+
+        ];
+
+
+        valores.forEach((valor,i)=>{
+
+            doc.setDrawColor(0,0,0);
+
+            doc.setLineWidth(0.3);
+
+
+            doc.rect(
+
+                xFila,
+                y,
+                anchos[i],
+                altoFila
+
+            );
+
+
+            if(i === 0){
+
+                doc.text(
+
+                    valor,
+                    xFila + 2,
+                    y + 5
+
+                );
+
+            }else{
+
+                doc.text(
+
+                    valor,
+                    xFila + anchos[i]/2,
+                    y + 5,
+                    {align:"center"}
+
+                );
+
+            }
+
+
+            xFila += anchos[i];
+
+        });
+
+
+        y += altoFila;
+
+    });
+
+
+    /* TOTAL GENERAL */
+
+    if(y + 15 > 270){
+
+        doc.addPage();
+
+        y = 20;
+
+    }
+
+
+    y += 8;
+
+
+    const anchoTotal =
+
+        anchos[1] +
+        anchos[2] +
+        anchos[3];
+
+
+    const xTotal =
+
+        inicioX +
+        anchos[0];
+
+
+    doc.setFont("helvetica","bold");
+
+    doc.setFontSize(11);
+
+
+    doc.rect(
+
+        xTotal,
+        y,
+        anchoTotal,
+        10
+
+    );
+
+
+    doc.text(
+
+        "TOTAL GENERAL:",
+
+        xTotal + 5,
+        y + 6.5
+
+    );
+
+
+    doc.text(
+
+        "$" + totalGeneral.toFixed(2),
+
+        xTotal + anchoTotal - 5,
+        y + 6.5,
+        {align:"right"}
+
+    );
+
+
+    doc.save(
+        "cotizacion_pro.pdf"
+    );
+
+}
+
+
+/* ==========================================================
+   ENTER PARA AGREGAR COTIZACIÓN
+========================================================== */
+
+document
+.getElementById("cantidadCot")
+.addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+
+        agregarFilaCotizacion();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
